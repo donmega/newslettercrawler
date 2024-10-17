@@ -7,10 +7,13 @@ import time
 # Configuration
 EMAIL_ADDRESS = "your_email@example.com"
 HEADERS = {
-    "User-Agent": "Mozilla/5.0 (compatible; NewsletterCrawler/1.0; +http://yourdomain.com/bot)"
+    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.80 Safari/537.36"
 }
 TIMEOUT = 10
 DELAY_BETWEEN_REQUESTS = 2  # seconds
+
+# Added log file for successful submissions
+SUCCESS_LOG_FILE = 'successful_submissions.txt'
 
 def is_valid_url(url):
     parsed = urlparse(url)
@@ -52,6 +55,11 @@ def submit_form(form, base_url):
             response = requests.post(url, data=data, headers=HEADERS, timeout=TIMEOUT)
         else:
             response = requests.get(url, params=data, headers=HEADERS, timeout=TIMEOUT)
+
+        # Log successful submissions
+        if response.status_code >= 200 and response.status_code < 300:
+            with open(SUCCESS_LOG_FILE, 'a') as f:
+                f.write(f"{url}\n")
         return response.status_code, response.url
     except requests.RequestException as e:
         print(f"Failed to submit form at {url}: {e}")
@@ -92,5 +100,5 @@ def crawl(url, max_pages=100):
             continue
 
 if __name__ == "__main__":
-    start_url = "https://example.com"  # Replace with the starting URL
+    start_url = "https://ahrefs.com/top/shopping"  # Replace with the starting URL
     crawl(start_url, max_pages=50)
